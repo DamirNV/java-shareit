@@ -2,9 +2,12 @@ package ru.practicum.shareit.item;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.practicum.shareit.exception.NotFoundException;
+import ru.practicum.shareit.exception.NotOwnerException;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.UserRepository;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -25,15 +28,14 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public ItemDto findById(Long id) {
         Item item = itemRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Вещь с id " + id + " не найдена"));
+                .orElseThrow(() -> new NotFoundException("Вещь с id " + id + " не найдена"));
         return ItemMapper.toItemDto(item);
     }
 
     @Override
     public ItemDto create(Long ownerId, ItemDto itemDto) {
-        // Проверяем, существует ли пользователь
         if (!userRepository.existsById(ownerId)) {
-            throw new RuntimeException("Пользователь с id " + ownerId + " не найден");
+            throw new NotFoundException("Пользователь с id " + ownerId + " не найден");
         }
 
         Item item = ItemMapper.toItem(itemDto, ownerId);
@@ -43,16 +45,13 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ItemDto update(Long itemId, Long ownerId, ItemDto itemDto) {
-        // Проверяем, что вещь существует
         Item existingItem = itemRepository.findById(itemId)
-                .orElseThrow(() -> new RuntimeException("Вещь с id " + itemId + " не найдена"));
+                .orElseThrow(() -> new NotFoundException("Вещь с id " + itemId + " не найдена"));
 
-        // Проверяем, что пользователь - владелец
         if (!ownerId.equals(existingItem.getOwner())) {
-            throw new RuntimeException("Пользователь с id " + ownerId + " не является владельцем вещи");
+            throw new NotOwnerException("Пользователь с id " + ownerId + " не является владельцем вещи");
         }
 
-        // Обновляем только непустые поля
         if (itemDto.getName() != null) {
             existingItem.setName(itemDto.getName());
         }
