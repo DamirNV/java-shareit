@@ -46,4 +46,10 @@ public class ErrorHandler {
     public Map<String, String> handleThrowable(Throwable e) {
         return Map.of("error", "Произошла непредвиденная ошибка: " + e.getMessage());
     }
+
+    @ExceptionHandler(ValidationException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Map<String, String> handleValidation(ValidationException e) {
+        return Map.of("error", e.getMessage());
+    }
 }
