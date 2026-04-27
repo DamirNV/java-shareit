@@ -1,12 +1,56 @@
 package ru.practicum.shareit.booking;
 
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.*;
+import ru.practicum.shareit.booking.dto.BookingDto;
+import ru.practicum.shareit.constant.HttpHeadersConstants;
+import java.util.List;
 
-/**
- * TODO Sprint add-bookings.
- */
 @RestController
-@RequestMapping(path = "/bookings")
+@RequestMapping("/bookings")
+@RequiredArgsConstructor
 public class BookingController {
+
+    private final BookingService bookingService;
+
+    @PostMapping
+    public BookingDto create(
+            @RequestHeader(HttpHeadersConstants.X_SHARER_USER_ID) Long userId,
+            @RequestBody BookingDto bookingDto
+    ) {
+        return bookingService.create(userId, bookingDto);
+    }
+
+    @PatchMapping("/{bookingId}")
+    public BookingDto approve(
+            @PathVariable Long bookingId,
+            @RequestHeader(HttpHeadersConstants.X_SHARER_USER_ID) Long userId,
+            @RequestParam Boolean approved
+    ) {
+        return bookingService.approve(bookingId, userId, approved);
+    }
+
+    @GetMapping("/{bookingId}")
+    public BookingDto findById(
+            @PathVariable Long bookingId,
+            @RequestHeader(HttpHeadersConstants.X_SHARER_USER_ID) Long userId
+    ) {
+        return bookingService.findById(bookingId, userId);
+    }
+
+    @GetMapping
+    public List<BookingDto> findAllByUser(
+            @RequestHeader(HttpHeadersConstants.X_SHARER_USER_ID) Long userId,
+            @RequestParam(defaultValue = "ALL") String state
+    ) {
+        return bookingService.findAllByUser(userId, state);
+    }
+
+    @GetMapping("/owner")
+    public List<BookingDto> findAllByOwner(
+            @RequestHeader(HttpHeadersConstants.X_SHARER_USER_ID) Long userId,
+            @RequestParam(defaultValue = "ALL") String state
+    ) {
+        return bookingService.findAllByOwner(userId, state);
+    }
 }
