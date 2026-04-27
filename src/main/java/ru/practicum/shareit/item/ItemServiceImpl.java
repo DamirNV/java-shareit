@@ -62,13 +62,15 @@ public class ItemServiceImpl implements ItemService {
             existingItem.setAvailable(itemDto.getAvailable());
         }
 
-        itemRepository.update(existingItem);
-        return ItemMapper.toItemDto(existingItem);
+        return ItemMapper.toItemDto(itemRepository.save(existingItem));
     }
 
     @Override
     public List<ItemDto> search(String text) {
-        return itemRepository.searchByText(text).stream()
+        if (text == null || text.isBlank()) {
+            return List.of();
+        }
+        return itemRepository.search(text).stream()
                 .map(ItemMapper::toItemDto)
                 .collect(Collectors.toList());
     }
