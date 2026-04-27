@@ -55,4 +55,15 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     Optional<Booking> findByIdAndBookerId(Long bookingId, Long bookerId);
     Optional<Booking> findByIdAndItemOwnerId(Long bookingId, Long ownerId);
     boolean existsByBookerIdAndItemIdAndEndBefore(Long bookerId, Long itemId, LocalDateTime now);
+
+    // Найти последнее завершённое бронирование для вещи
+    @Query("SELECT b FROM Booking b WHERE b.item.id = :itemId AND b.end < :now AND b.status = 'APPROVED' ORDER BY b.end DESC")
+    Optional<Booking> findLastBookingByItemId(@Param("itemId") Long itemId, @Param("now") LocalDateTime now);
+
+    // Найти следующее подтверждённое бронирование для вещи
+    @Query("SELECT b FROM Booking b WHERE b.item.id = :itemId AND b.start > :now AND b.status = 'APPROVED' ORDER BY b.start ASC")
+    Optional<Booking> findNextBookingByItemId(@Param("itemId") Long itemId, @Param("now") LocalDateTime now);
+
+    // Найти все бронирования для списка вещей
+    List<Booking> findByItemIdIn(List<Long> itemIds);
 }

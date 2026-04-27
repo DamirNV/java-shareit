@@ -4,7 +4,9 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.constant.HttpHeadersConstants;
+import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.ItemWithBookingsDto;
 
 import java.util.List;
 
@@ -33,12 +35,12 @@ public class ItemController {
     }
 
     @GetMapping("/{itemId}")
-    public ItemDto findById(@PathVariable Long itemId) {
+    public ItemWithBookingsDto findById(@PathVariable Long itemId) {
         return itemService.findById(itemId);
     }
 
     @GetMapping
-    public List<ItemDto> findAllByOwner(
+    public List<ItemWithBookingsDto> findAllByOwner(
             @RequestHeader(HttpHeadersConstants.X_SHARER_USER_ID) Long ownerId
     ) {
         return itemService.findAllByOwner(ownerId);
@@ -47,5 +49,14 @@ public class ItemController {
     @GetMapping("/search")
     public List<ItemDto> search(@RequestParam String text) {
         return itemService.search(text);
+    }
+
+    @PostMapping("/{itemId}/comment")
+    public CommentDto addComment(
+            @RequestHeader(HttpHeadersConstants.X_SHARER_USER_ID) Long userId,
+            @PathVariable Long itemId,
+            @Valid @RequestBody CommentDto commentDto
+    ) {
+        return itemService.addComment(userId, itemId, commentDto);
     }
 }
