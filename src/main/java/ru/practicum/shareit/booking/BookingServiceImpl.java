@@ -8,6 +8,7 @@ import ru.practicum.shareit.booking.dto.BookingCreateDto;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.exception.NotFoundException;
+import ru.practicum.shareit.exception.NotOwnerException;
 import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.item.ItemRepository;
 import ru.practicum.shareit.item.model.Item;
@@ -41,25 +42,20 @@ public class BookingServiceImpl implements BookingService {
     @Override
     @Transactional
     public BookingDto create(Long userId, BookingCreateDto bookingCreateDto) {
-        // Проверяем пользователя
         User booker = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("Пользователь с id " + userId + " не найден"));
 
-        // Проверяем вещь
         Item item = itemRepository.findById(bookingCreateDto.getItemId())
                 .orElseThrow(() -> new NotFoundException("Вещь с id " + bookingCreateDto.getItemId() + " не найдена"));
 
-        // Проверяем, что вещь доступна для бронирования
         if (!item.getAvailable()) {
             throw new ValidationException("Вещь с id " + item.getId() + " недоступна для бронирования");
         }
 
-        // Владелец не может бронировать свою вещь
         if (item.getOwner().equals(userId)) {
             throw new NotFoundException("Владелец не может бронировать свою вещь");
         }
 
-        // Проверяем даты
         LocalDateTime start = bookingCreateDto.getStart();
         LocalDateTime end = bookingCreateDto.getEnd();
         if (start == null || end == null) {
@@ -72,7 +68,6 @@ public class BookingServiceImpl implements BookingService {
             throw new ValidationException("Дата начала не может быть в прошлом");
         }
 
-        // Создаём бронирование
         Booking booking = new Booking();
         booking.setStart(start);
         booking.setEnd(end);
@@ -93,7 +88,7 @@ public class BookingServiceImpl implements BookingService {
                 .orElseThrow(() -> new NotFoundException("Бронирование с id " + bookingId + " не найдено"));
 
         if (!booking.getItem().getOwner().equals(userId)) {
-            throw new NotFoundException("Подтверждать бронирование может только владелец вещи");
+            throw new NotOwnerException("Подтверждать бронирование может только владелец вещи");
         }
 
         if (booking.getStatus() != BookingStatus.WAITING) {
@@ -165,7 +160,6 @@ public class BookingServiceImpl implements BookingService {
         userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("Пользователь с id " + userId + " не найден"));
 
-        // Проверяем, что у пользователя есть хотя бы одна вещь
         if (itemRepository.findAllByOwner(userId).isEmpty()) {
             return List.of();
         }
