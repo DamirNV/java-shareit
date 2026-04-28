@@ -40,20 +40,25 @@ public class BookingServiceImpl implements BookingService {
     @Override
     @Transactional
     public BookingDto create(Long userId, BookingDto bookingDto) {
+        // Проверяем пользователя
         User booker = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("Пользователь с id " + userId + " не найден"));
 
-        Item item = itemRepository.findById(bookingDto.getItemId())
-                .orElseThrow(() -> new NotFoundException("Вещь с id " + bookingDto.getItemId() + " не найдена"));
+        // Проверяем вещь
+        Item item = itemRepository.findById(bookingDto.getItem().getId())
+                .orElseThrow(() -> new NotFoundException("Вещь с id " + bookingDto.getItem().getId() + " не найдена"));
 
+        // Проверяем, что вещь доступна для бронирования
         if (!item.getAvailable()) {
             throw new ValidationException("Вещь с id " + item.getId() + " недоступна для бронирования");
         }
 
+        // Владелец не может бронировать свою вещь
         if (item.getOwner().equals(userId)) {
             throw new NotFoundException("Владелец не может бронировать свою вещь");
         }
 
+        // Проверяем даты
         LocalDateTime start = bookingDto.getStart();
         LocalDateTime end = bookingDto.getEnd();
         if (start == null || end == null) {
@@ -66,6 +71,7 @@ public class BookingServiceImpl implements BookingService {
             throw new ValidationException("Дата начала не может быть в прошлом");
         }
 
+        // Создаём бронирование
         Booking booking = new Booking();
         booking.setStart(start);
         booking.setEnd(end);
