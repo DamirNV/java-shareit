@@ -41,9 +41,11 @@ public class BookingServiceImpl implements BookingService {
     @Override
     @Transactional
     public BookingDto create(Long userId, BookingCreateDto bookingCreateDto) {
+        // Проверяем пользователя
         User booker = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("Пользователь с id " + userId + " не найден"));
 
+        // Проверяем вещь
         Item item = itemRepository.findById(bookingCreateDto.getItemId())
                 .orElseThrow(() -> new NotFoundException("Вещь с id " + bookingCreateDto.getItemId() + " не найдена"));
 
@@ -58,8 +60,8 @@ public class BookingServiceImpl implements BookingService {
         }
 
         // Проверяем даты
-        LocalDateTime start = bookingDto.getStart();
-        LocalDateTime end = bookingDto.getEnd();
+        LocalDateTime start = bookingCreateDto.getStart();
+        LocalDateTime end = bookingCreateDto.getEnd();
         if (start == null || end == null) {
             throw new ValidationException("Дата начала и окончания бронирования обязательны");
         }
