@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.practicum.shareit.booking.dto.BookingCreateDto;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.exception.NotFoundException;
@@ -39,14 +40,12 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     @Transactional
-    public BookingDto create(Long userId, BookingDto bookingDto) {
-        // Проверяем пользователя
+    public BookingDto create(Long userId, BookingCreateDto bookingCreateDto) {
         User booker = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("Пользователь с id " + userId + " не найден"));
 
-        // Проверяем вещь
-        Item item = itemRepository.findById(bookingDto.getItem().getId())
-                .orElseThrow(() -> new NotFoundException("Вещь с id " + bookingDto.getItem().getId() + " не найдена"));
+        Item item = itemRepository.findById(bookingCreateDto.getItemId())
+                .orElseThrow(() -> new NotFoundException("Вещь с id " + bookingCreateDto.getItemId() + " не найдена"));
 
         // Проверяем, что вещь доступна для бронирования
         if (!item.getAvailable()) {
