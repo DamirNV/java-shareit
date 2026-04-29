@@ -59,11 +59,13 @@ public class ItemServiceImpl implements ItemService {
                 .map(item -> {
                     List<Booking> itemBookings = bookingsByItem.getOrDefault(item.getId(), List.of());
 
+                    // lastBooking — только APPROVED и законченные
                     Booking lastBooking = itemBookings.stream()
                             .filter(b -> b.getEnd().isBefore(now) && b.getStatus() == BookingStatus.APPROVED)
                             .max((b1, b2) -> b1.getEnd().compareTo(b2.getEnd()))
                             .orElse(null);
 
+                    // nextBooking — только APPROVED и будущие
                     Booking nextBooking = itemBookings.stream()
                             .filter(b -> b.getStart().isAfter(now) && b.getStatus() == BookingStatus.APPROVED)
                             .min((b1, b2) -> b1.getStart().compareTo(b2.getStart()))
@@ -85,7 +87,10 @@ public class ItemServiceImpl implements ItemService {
 
         LocalDateTime now = LocalDateTime.now();
 
+        // lastBooking — только APPROVED и законченные
         Booking lastBooking = bookingRepository.findLastBookingByItemId(id, now).orElse(null);
+
+        // nextBooking — только APPROVED и будущие
         Booking nextBooking = bookingRepository.findNextBookingByItemId(id, now).orElse(null);
 
         List<CommentDto> comments = commentRepository.findByItemId(id).stream()
