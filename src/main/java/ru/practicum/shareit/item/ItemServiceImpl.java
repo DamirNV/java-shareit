@@ -45,8 +45,8 @@ public class ItemServiceImpl implements ItemService {
 
         List<Long> itemIds = items.stream().map(Item::getId).collect(Collectors.toList());
 
-        List<Booking> allBookings = bookingRepository.findByItemIdIn(itemIds);
-        Map<Long, List<Booking>> bookingsByItem = allBookings.stream()
+        List<Booking> approvedBookings = bookingRepository.findApprovedByItemIdIn(itemIds);
+        Map<Long, List<Booking>> bookingsByItem = approvedBookings.stream()
                 .collect(Collectors.groupingBy(b -> b.getItem().getId()));
 
         List<Comment> allComments = commentRepository.findByItemIdIn(itemIds);
@@ -59,15 +59,13 @@ public class ItemServiceImpl implements ItemService {
                 .map(item -> {
                     List<Booking> itemBookings = bookingsByItem.getOrDefault(item.getId(), List.of());
 
-                    // lastBooking — только APPROVED и законченные
                     Booking lastBooking = itemBookings.stream()
-                            .filter(b -> b.getEnd().isBefore(now) && b.getStatus() == BookingStatus.APPROVED)
+                            .filter(b -> b.getEnd().isBefore(now))
                             .max((b1, b2) -> b1.getEnd().compareTo(b2.getEnd()))
                             .orElse(null);
 
-                    // nextBooking — только APPROVED и будущие
                     Booking nextBooking = itemBookings.stream()
-                            .filter(b -> b.getStart().isAfter(now) && b.getStatus() == BookingStatus.APPROVED)
+                            .filter(b -> b.getStart().isAfter(now))
                             .min((b1, b2) -> b1.getStart().compareTo(b2.getStart()))
                             .orElse(null);
 
@@ -81,17 +79,24 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public ItemWithBookingsDto findById(Long id) {
+    public ItemWithBookingsDto findById(Long id, Long userId) {
+        userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("Пользователь с id " + userId + " не найден"));
+
         Item item = itemRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Вещь с id " + id + " не найдена"));
 
         LocalDateTime now = LocalDateTime.now();
 
-        // lastBooking — только APPROVED и законченные
-        Booking lastBooking = bookingRepository.findLastBookingByItemId(id, now).orElse(null);
+        boolean isOwner = item.getOwner().equals(userId);
 
-        // nextBooking — только APPROVED и будущие
-        Booking nextBooking = bookingRepository.findNextBookingByItemId(id, now).orElse(null);
+        Booking lastBooking = null;
+        Booking nextBooking = null;
+
+        if (isOwner) {
+            lastBooking = bookingRepository.findLastBookingByItemId(id, now).orElse(null);
+            nextBooking = bookingRepository.findNextBookingByItemId(id, now).orElse(null);
+        }
 
         List<CommentDto> comments = commentRepository.findByItemId(id).stream()
                 .map(CommentMapper::toCommentDto)

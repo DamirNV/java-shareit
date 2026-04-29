@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.BookingStatus;
+
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -50,6 +51,9 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     @Query("SELECT b FROM Booking b WHERE b.item.id IN :itemIds")
     List<Booking> findByItemIdIn(@Param("itemIds") List<Long> itemIds);
+
+    @Query("SELECT b FROM Booking b WHERE b.item.id IN :itemIds AND b.status = 'APPROVED'")
+    List<Booking> findApprovedByItemIdIn(@Param("itemIds") List<Long> itemIds);
 
     @Query("SELECT CASE WHEN COUNT(b) > 0 THEN true ELSE false END FROM Booking b " +
             "WHERE b.booker.id = :bookerId AND b.item.id = :itemId " +

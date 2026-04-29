@@ -35,8 +35,11 @@ public class ItemController {
     }
 
     @GetMapping("/{itemId}")
-    public ItemWithBookingsDto findById(@PathVariable Long itemId) {
-        return itemService.findById(itemId);
+    public ItemWithBookingsDto findById(
+            @PathVariable Long itemId,
+            @RequestHeader(HttpHeadersConstants.X_SHARER_USER_ID) Long userId
+    ) {
+        return itemService.findById(itemId, userId);
     }
 
     @GetMapping

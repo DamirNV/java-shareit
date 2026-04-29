@@ -58,14 +58,9 @@ public class BookingServiceImpl implements BookingService {
 
         LocalDateTime start = bookingCreateDto.getStart();
         LocalDateTime end = bookingCreateDto.getEnd();
-        if (start == null || end == null) {
-            throw new ValidationException("Дата начала и окончания бронирования обязательны");
-        }
+
         if (start.isAfter(end) || start.equals(end)) {
             throw new ValidationException("Дата начала должна быть раньше даты окончания");
-        }
-        if (start.isBefore(LocalDateTime.now())) {
-            throw new ValidationException("Дата начала не может быть в прошлом");
         }
 
         Booking booking = new Booking();
@@ -81,25 +76,20 @@ public class BookingServiceImpl implements BookingService {
     @Override
     @Transactional
     public BookingDto approve(Long bookingId, Long userId, Boolean approved) {
-        // Проверяем, что пользователь существует
         userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("Пользователь с id " + userId + " не найден"));
 
-        // Находим бронирование обычным findById (без фильтрации по владельцу)
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new NotFoundException("Бронирование с id " + bookingId + " не найдено"));
 
-        // Проверяем, что пользователь — владелец вещи
         if (!booking.getItem().getOwner().equals(userId)) {
             throw new NotOwnerException("Подтверждать бронирование может только владелец вещи");
         }
 
-        // Проверяем статус
         if (booking.getStatus() != BookingStatus.WAITING) {
             throw new ValidationException("Бронирование уже обработано. Текущий статус: " + booking.getStatus());
         }
 
-        // Обновляем статус
         booking.setStatus(approved ? BookingStatus.APPROVED : BookingStatus.REJECTED);
 
         return BookingMapper.toBookingDto(bookingRepository.save(booking));
