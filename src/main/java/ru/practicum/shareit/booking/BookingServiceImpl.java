@@ -27,18 +27,6 @@ public class BookingServiceImpl implements BookingService {
     private final UserRepository userRepository;
     private final ItemRepository itemRepository;
 
-    private Sort getSort() {
-        return Sort.by(Sort.Direction.DESC, "start");
-    }
-
-    private BookingState parseState(String state) {
-        try {
-            return BookingState.valueOf(state);
-        } catch (IllegalArgumentException e) {
-            throw new ValidationException("Unknown state: " + state);
-        }
-    }
-
     @Override
     @Transactional
     public BookingDto create(Long userId, BookingCreateDto bookingCreateDto) {
@@ -186,5 +174,17 @@ public class BookingServiceImpl implements BookingService {
         return bookings.stream()
                 .map(BookingMapper::toBookingDto)
                 .collect(Collectors.toList());
+    }
+
+    private Sort getSort() {
+        return Sort.by(Sort.Direction.DESC, "start");
+    }
+
+    private BookingState parseState(String state) {
+        try {
+            return BookingState.valueOf(state);
+        } catch (IllegalArgumentException e) {
+            throw new ValidationException("Unknown state: " + state);
+        }
     }
 }
