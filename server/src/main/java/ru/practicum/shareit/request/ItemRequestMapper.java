@@ -5,7 +5,6 @@ import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.request.model.ItemRequest;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class ItemRequestMapper {
 
