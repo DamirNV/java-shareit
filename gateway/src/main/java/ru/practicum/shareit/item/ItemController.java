@@ -2,61 +2,62 @@ package ru.practicum.shareit.item;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.constant.HttpHeadersConstants;
-
-import java.util.List;
+import ru.practicum.shareit.item.dto.CommentDto;
+import ru.practicum.shareit.item.dto.ItemDto;
 
 @RestController
 @RequestMapping("/items")
 @RequiredArgsConstructor
 public class ItemController {
 
-    private final ItemService itemService;
+    private final ItemClient itemClient;
 
     @PostMapping
-    public ItemDto create(
+    public ResponseEntity<Object> create(
             @RequestHeader(HttpHeadersConstants.X_SHARER_USER_ID) Long ownerId,
             @Valid @RequestBody ItemDto itemDto
     ) {
-        return itemService.create(ownerId, itemDto);
+        return itemClient.create(ownerId, itemDto);
     }
 
     @PatchMapping("/{itemId}")
-    public ItemDto update(
+    public ResponseEntity<Object> update(
             @PathVariable Long itemId,
             @RequestHeader(HttpHeadersConstants.X_SHARER_USER_ID) Long ownerId,
             @RequestBody ItemDto itemDto
     ) {
-        return itemService.update(itemId, ownerId, itemDto);
+        return itemClient.update(itemId, ownerId, itemDto);
     }
 
     @GetMapping("/{itemId}")
-    public ItemWithBookingsDto findById(
+    public ResponseEntity<Object> findById(
             @PathVariable Long itemId,
             @RequestHeader(HttpHeadersConstants.X_SHARER_USER_ID) Long userId
     ) {
-        return itemService.findById(itemId, userId);
+        return itemClient.findById(itemId, userId);
     }
 
     @GetMapping
-    public List<ItemWithBookingsDto> findAllByOwner(
+    public ResponseEntity<Object> findAllByOwner(
             @RequestHeader(HttpHeadersConstants.X_SHARER_USER_ID) Long ownerId
     ) {
-        return itemService.findAllByOwner(ownerId);
+        return itemClient.findAllByOwner(ownerId);
     }
 
     @GetMapping("/search")
-    public List<ItemDto> search(@RequestParam String text) {
-        return itemService.search(text);
+    public ResponseEntity<Object> search(@RequestParam String text) {
+        return itemClient.search(text);
     }
 
     @PostMapping("/{itemId}/comment")
-    public CommentDto addComment(
+    public ResponseEntity<Object> addComment(
             @RequestHeader(HttpHeadersConstants.X_SHARER_USER_ID) Long userId,
             @PathVariable Long itemId,
             @Valid @RequestBody CommentDto commentDto
     ) {
-        return itemService.addComment(userId, itemId, commentDto);
+        return itemClient.addComment(userId, itemId, commentDto);
     }
 }
