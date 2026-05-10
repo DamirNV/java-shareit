@@ -17,7 +17,7 @@ public class BookingController {
     @PostMapping
     public BookingDto create(
             @RequestHeader(HttpHeadersConstants.X_SHARER_USER_ID) Long userId,
-            @Valid @RequestBody BookingCreateDto bookingCreateDto
+            @RequestBody BookingCreateDto bookingCreateDto
     ) {
         return bookingService.create(userId, bookingCreateDto);
     }

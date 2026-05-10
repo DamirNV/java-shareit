@@ -17,7 +17,7 @@ public class ItemController {
     @PostMapping
     public ItemDto create(
             @RequestHeader(HttpHeadersConstants.X_SHARER_USER_ID) Long ownerId,
-            @Valid @RequestBody ItemDto itemDto
+            @RequestBody ItemDto itemDto
     ) {
         return itemService.create(ownerId, itemDto);
     }
@@ -55,7 +55,7 @@ public class ItemController {
     public CommentDto addComment(
             @RequestHeader(HttpHeadersConstants.X_SHARER_USER_ID) Long userId,
             @PathVariable Long itemId,
-            @Valid @RequestBody CommentDto commentDto
+            @RequestBody CommentDto commentDto
     ) {
         return itemService.addComment(userId, itemId, commentDto);
     }

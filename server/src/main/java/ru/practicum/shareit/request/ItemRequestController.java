@@ -17,7 +17,7 @@ public class ItemRequestController {
     @PostMapping
     public ItemRequestDto create(
             @RequestHeader(HttpHeadersConstants.X_SHARER_USER_ID) Long userId,
-            @Valid @RequestBody ItemRequestCreateDto createDto
+            @RequestBody ItemRequestCreateDto createDto
     ) {
         return requestService.create(userId, createDto);
     }
