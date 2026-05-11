@@ -1,4 +1,4 @@
-FROM eclipse-temurin:21-jdk
+FROM eclipse-temurin:21-jre-jammy
 WORKDIR /app
 COPY target/shareit-server-0.0.1-SNAPSHOT.jar app.jar
 EXPOSE 9090
