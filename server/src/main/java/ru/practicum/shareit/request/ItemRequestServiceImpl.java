@@ -68,7 +68,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
         ItemRequest request = requestRepository.findById(requestId)
                 .orElseThrow(() -> new NotFoundException("Запрос с id " + requestId + " не найден"));
 
-        List<ItemShortDto> items = itemRepository.findAllByRequest(requestId).stream()
+        List<ItemShortDto> items = itemRepository.findAllByRequestIdIn(List.of(requestId)).stream()
                 .map(item -> new ItemShortDto(item.getId(), item.getName()))
                 .collect(Collectors.toList());
 
@@ -85,9 +85,10 @@ public class ItemRequestServiceImpl implements ItemRequestService {
                 .collect(Collectors.toList());
 
         List<Item> allItems = itemRepository.findAllByRequestIdIn(requestIds);
+
         Map<Long, List<ItemShortDto>> itemsByRequest = allItems.stream()
                 .collect(Collectors.groupingBy(
-                        Item::getRequest,
+                        item -> item.getRequest().getId(),
                         Collectors.mapping(item -> new ItemShortDto(item.getId(), item.getName()), Collectors.toList())
                 ));
 
