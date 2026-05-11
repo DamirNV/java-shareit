@@ -23,8 +23,8 @@ class BookingCreateDtoJsonTest {
 
     @Test
     void shouldSerializeBookingCreateDto() throws Exception {
-        LocalDateTime start = LocalDateTime.now().plusDays(1);
-        LocalDateTime end = LocalDateTime.now().plusDays(2);
+        LocalDateTime start = LocalDateTime.now().plusDays(1).withNano(0);
+        LocalDateTime end = LocalDateTime.now().plusDays(2).withNano(0);
 
         BookingCreateDto dto = new BookingCreateDto();
         dto.setItemId(1L);
@@ -40,8 +40,8 @@ class BookingCreateDtoJsonTest {
 
     @Test
     void shouldDeserializeBookingCreateDto() throws Exception {
-        LocalDateTime start = LocalDateTime.now().plusDays(1);
-        LocalDateTime end = LocalDateTime.now().plusDays(2);
+        LocalDateTime start = LocalDateTime.now().plusDays(1).withNano(0);
+        LocalDateTime end = LocalDateTime.now().plusDays(2).withNano(0);
 
         String content = String.format(
                 "{\"itemId\":1,\"start\":\"%s\",\"end\":\"%s\"}",
@@ -52,7 +52,7 @@ class BookingCreateDtoJsonTest {
         BookingCreateDto result = json.parse(content).getObject();
 
         assertThat(result.getItemId()).isEqualTo(1L);
-        assertThat(result.getStart()).isEqualTo(start.withNano(0));
-        assertThat(result.getEnd()).isEqualTo(end.withNano(0));
+        assertThat(result.getStart()).isEqualTo(start);
+        assertThat(result.getEnd()).isEqualTo(end);
     }
 }

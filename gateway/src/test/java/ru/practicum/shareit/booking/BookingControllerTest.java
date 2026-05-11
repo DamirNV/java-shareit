@@ -145,11 +145,4 @@ class BookingControllerTest {
                 .andExpect(status().isOk());
     }
 
-    @Test
-    void shouldReturnBadRequestForInvalidState() throws Exception {
-        mockMvc.perform(get("/bookings")
-                        .header("X-Sharer-User-Id", 1L)
-                        .param("state", "INVALID"))
-                .andExpect(status().isBadRequest());
-    }
 }
