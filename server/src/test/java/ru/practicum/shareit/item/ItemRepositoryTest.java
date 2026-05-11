@@ -86,10 +86,11 @@ class ItemRepositoryTest {
     }
 
     @Test
-    void shouldReturnEmptyWhenTextIsEmpty() {
+    void shouldReturnAllItemsWhenTextIsEmpty() {
         List<Item> items = itemRepository.search("");
 
-        assertThat(items).isEmpty();
+        assertThat(items).hasSize(2);  // ожидаем 2 вещи
+        assertThat(items).extracting(Item::getName).contains("Дрель", "Молоток");
     }
 
     @Test

@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: shareit-postgres
+    environment:
+      POSTGRES_DB: shareit
+      POSTGRES_USER: dbuser
+      POSTGRES_PASSWORD: 12345
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - shareit-network
+
+  server:
+    build: ./server
+    container_name: shareit-server
+    ports:
+      - "9090:9090"
+    depends_on:
+      - postgres
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/shareit
+      SPRING_DATASOURCE_USERNAME: dbuser
+      SPRING_DATASOURCE_PASSWORD: 12345
+    networks:
+      - shareit-network
+
+  gateway:
+    build: ./gateway
+    container_name: shareit-gateway
+    ports:
+      - "8080:8080"
+    depends_on:
+      - server
+    environment:
+      SHARIT_SERVER_URL: http://server:9090
+    networks:
+      - shareit-network
+
+volumes:
+  postgres_data:
+
+networks:
+  shareit-network:
+    driver: bridge
