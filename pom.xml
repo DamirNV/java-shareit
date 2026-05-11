@@ -62,4 +62,15 @@
         </pluginManagement>
     </build>
 
+    <profiles>
+        <profile>
+            <id>check</id>
+            <build>
+                <plugins>
+                    <!-- Этот профиль можно оставить пустым или добавить нужные плагины -->
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
 </project>
