@@ -9,6 +9,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.practicum.shareit.booking.dto.BookingCreateDto;
+import ru.practicum.shareit.constant.HttpHeadersConstants;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -42,7 +43,7 @@ class BookingControllerTest {
                 .thenReturn(ResponseEntity.ok(Map.of("id", 1L)));
 
         mockMvc.perform(post("/bookings")
-                        .header("X-Sharer-User-Id", 2L)
+                        .header(HttpHeadersConstants.X_SHARER_USER_ID, 2L)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(createDto)))
                 .andExpect(status().isOk());
@@ -55,7 +56,7 @@ class BookingControllerTest {
         createDto.setEnd(LocalDateTime.now().plusDays(2));
 
         mockMvc.perform(post("/bookings")
-                        .header("X-Sharer-User-Id", 2L)
+                        .header(HttpHeadersConstants.X_SHARER_USER_ID, 2L)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(createDto)))
                 .andExpect(status().isBadRequest());
@@ -68,7 +69,7 @@ class BookingControllerTest {
         createDto.setStart(LocalDateTime.now().plusDays(1));
 
         mockMvc.perform(post("/bookings")
-                        .header("X-Sharer-User-Id", 2L)
+                        .header(HttpHeadersConstants.X_SHARER_USER_ID, 2L)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(createDto)))
                 .andExpect(status().isBadRequest());
@@ -82,7 +83,7 @@ class BookingControllerTest {
         createDto.setEnd(LocalDateTime.now().plusDays(2));
 
         mockMvc.perform(post("/bookings")
-                        .header("X-Sharer-User-Id", 2L)
+                        .header(HttpHeadersConstants.X_SHARER_USER_ID, 2L)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(createDto)))
                 .andExpect(status().isBadRequest());
@@ -96,7 +97,7 @@ class BookingControllerTest {
         createDto.setEnd(LocalDateTime.now().minusDays(1));
 
         mockMvc.perform(post("/bookings")
-                        .header("X-Sharer-User-Id", 2L)
+                        .header(HttpHeadersConstants.X_SHARER_USER_ID, 2L)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(createDto)))
                 .andExpect(status().isBadRequest());
@@ -108,7 +109,7 @@ class BookingControllerTest {
                 .thenReturn(ResponseEntity.ok(Map.of("status", "APPROVED")));
 
         mockMvc.perform(patch("/bookings/1")
-                        .header("X-Sharer-User-Id", 1L)
+                        .header(HttpHeadersConstants.X_SHARER_USER_ID, 1L)
                         .param("approved", "true"))
                 .andExpect(status().isOk());
     }
@@ -119,7 +120,7 @@ class BookingControllerTest {
                 .thenReturn(ResponseEntity.ok(Map.of("id", 1L)));
 
         mockMvc.perform(get("/bookings/1")
-                        .header("X-Sharer-User-Id", 1L))
+                        .header(HttpHeadersConstants.X_SHARER_USER_ID, 1L))
                 .andExpect(status().isOk());
     }
 
@@ -129,7 +130,7 @@ class BookingControllerTest {
                 .thenReturn(ResponseEntity.ok(List.of()));
 
         mockMvc.perform(get("/bookings")
-                        .header("X-Sharer-User-Id", 1L)
+                        .header(HttpHeadersConstants.X_SHARER_USER_ID, 1L)
                         .param("state", "ALL"))
                 .andExpect(status().isOk());
     }
@@ -140,9 +141,8 @@ class BookingControllerTest {
                 .thenReturn(ResponseEntity.ok(List.of()));
 
         mockMvc.perform(get("/bookings/owner")
-                        .header("X-Sharer-User-Id", 1L)
+                        .header(HttpHeadersConstants.X_SHARER_USER_ID, 1L)
                         .param("state", "ALL"))
                 .andExpect(status().isOk());
     }
-
 }
