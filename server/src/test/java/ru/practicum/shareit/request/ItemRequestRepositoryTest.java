@@ -1,6 +1,5 @@
 package ru.practicum.shareit.request;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -25,42 +24,29 @@ class ItemRequestRepositoryTest {
     @Autowired
     private ItemRequestRepository requestRepository;
 
-    private User user1;
-    private User user2;
-    private ItemRequest request1;
-    private ItemRequest request2;
+    @Test
+    void shouldFindAllByRequestorId() {
+        User user = new User();
+        user.setName("Пользователь");
+        user.setEmail("user@example.com");
+        entityManager.persist(user);
 
-    @BeforeEach
-    void setUp() {
-        user1 = new User();
-        user1.setName("Пользователь 1");
-        user1.setEmail("user1@example.com");
-        entityManager.persist(user1);
-
-        user2 = new User();
-        user2.setName("Пользователь 2");
-        user2.setEmail("user2@example.com");
-        entityManager.persist(user2);
-
-        request1 = new ItemRequest();
+        ItemRequest request1 = new ItemRequest();
         request1.setDescription("Ищу дрель");
-        request1.setRequestor(user1);
+        request1.setRequestor(user);
         request1.setCreated(LocalDateTime.now().minusDays(1));
         entityManager.persist(request1);
 
-        request2 = new ItemRequest();
+        ItemRequest request2 = new ItemRequest();
         request2.setDescription("Ищу молоток");
-        request2.setRequestor(user1);
+        request2.setRequestor(user);
         request2.setCreated(LocalDateTime.now());
         entityManager.persist(request2);
 
         entityManager.flush();
-    }
 
-    @Test
-    void shouldFindAllByRequestorId() {
         List<ItemRequest> requests = requestRepository.findAllByRequestorId(
-                user1.getId(),
+                user.getId(),
                 Sort.by(Sort.Direction.DESC, "created")
         );
 
@@ -71,6 +57,24 @@ class ItemRequestRepositoryTest {
 
     @Test
     void shouldFindAllByRequestorIdNot() {
+        User user1 = new User();
+        user1.setName("Пользователь 1");
+        user1.setEmail("user1@example.com");
+        entityManager.persist(user1);
+
+        User user2 = new User();
+        user2.setName("Пользователь 2");
+        user2.setEmail("user2@example.com");
+        entityManager.persist(user2);
+
+        ItemRequest request = new ItemRequest();
+        request.setDescription("Ищу что-то");
+        request.setRequestor(user1);
+        request.setCreated(LocalDateTime.now());
+        entityManager.persist(request);
+
+        entityManager.flush();
+
         List<ItemRequest> requests = requestRepository.findAllByRequestorIdNot(
                 user1.getId(),
                 Sort.by(Sort.Direction.DESC, "created")
@@ -81,8 +85,14 @@ class ItemRequestRepositoryTest {
 
     @Test
     void shouldReturnEmptyWhenNoRequests() {
+        User user = new User();
+        user.setName("Пользователь");
+        user.setEmail("user@example.com");
+        entityManager.persist(user);
+        entityManager.flush();
+
         List<ItemRequest> requests = requestRepository.findAllByRequestorId(
-                999L,
+                user.getId(),
                 Sort.by(Sort.Direction.DESC, "created")
         );
 
