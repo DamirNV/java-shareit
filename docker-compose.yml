@@ -35,7 +35,7 @@ services:
     depends_on:
       - server
     environment:
-      SHARIT_SERVER_URL: http://server:9090
+      SHAREIT_SERVER_URL: http://server:9090
     networks:
       - shareit-network
 
