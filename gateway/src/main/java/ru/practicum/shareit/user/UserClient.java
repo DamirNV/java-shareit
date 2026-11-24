@@ -38,6 +38,6 @@ public class UserClient extends BaseClient {
     }
 
     public ResponseEntity<Object> delete(Long id) {
-        return get(serverUrl + "/users/{id}", null, Map.of("id", id));
+        return delete(serverUrl + "/users/{id}", null, Map.of("id", id));
     }
 }
