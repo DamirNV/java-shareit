@@ -22,6 +22,10 @@ public class BaseClient {
         return makeAndSendRequest(HttpMethod.GET, path, userId, parameters, null);
     }
 
+    protected ResponseEntity<Object> delete(String path, Long userId, Map<String, Object> parameters) {
+        return makeAndSendRequest(HttpMethod.DELETE, path, userId, parameters, null);
+    }
+
     protected ResponseEntity<Object> post(String path, Long userId, Object body) {
         return makeAndSendRequest(HttpMethod.POST, path, userId, null, body);
     }
